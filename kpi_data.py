@@ -1,10 +1,15 @@
-import scipy.stats
+from scipy.stats import norm
 
-# Define KPI formulas, benchmarks, and commentary for each industry
+# Function to calculate Sigma Score
+def calculate_sigma_score(dpm):
+    return norm.ppf(1 - (dpm / 1_000_000)) + 1.5
+
+# KPI Definitions
 INDUSTRY_DATA = {
     "Rigid Plastics": {
         "On-Time Delivery Rate": {
             "formula": lambda on_time, total: (on_time / total) * 100,
+            "parameters": ["on_time", "total"],
             "benchmark": (95, 98),
             "commentary": {
                 "high": "Excellent performance! You are exceeding industry standards.",
@@ -12,17 +17,29 @@ INDUSTRY_DATA = {
                 "low": "Performance is below industry standards. Investigate delays.",
             },
         },
-        "Scrap Rate": {
-            "formula": lambda scrap, total: (scrap / total) * 100,
-            "benchmark": (2, 5),
+        "Inventory Turnover Ratio": {
+            "formula": lambda cogs, avg_inventory: cogs / avg_inventory,
+            "parameters": ["cogs", "avg_inventory"],
+            "benchmark": (5, 10),
             "commentary": {
-                "high": "High scrap rates indicate inefficiencies in production.",
-                "medium": "Scrap rates are within acceptable limits.",
-                "low": "Excellent! Scrap rates are minimal.",
+                "high": "Excellent inventory turnover efficiency!",
+                "medium": "Acceptable turnover, but there’s room for improvement.",
+                "low": "Low turnover. Consider reducing excess stock.",
+            },
+        },
+        "Days of Inventory on Hand (DOH)": {
+            "formula": lambda avg_inventory, cogs: (avg_inventory / cogs) * 365,
+            "parameters": ["avg_inventory", "cogs"],
+            "benchmark": (30, 60),
+            "commentary": {
+                "high": "Inventory turnover is optimized.",
+                "medium": "Holding inventory for a moderate time.",
+                "low": "High inventory days. Consider adjusting stock levels.",
             },
         },
         "OEE (Overall Equipment Effectiveness)": {
             "formula": lambda availability, performance, quality: availability * performance * quality,
+            "parameters": ["availability", "performance", "quality"],
             "benchmark": (85, 90),
             "commentary": {
                 "high": "Excellent equipment utilization!",
@@ -30,19 +47,21 @@ INDUSTRY_DATA = {
                 "low": "Low OEE. Investigate downtime, speed losses, or defects.",
             },
         },
-        "Inventory Turnover Ratio": {
-            "formula": lambda cogs, avg_inventory: cogs / avg_inventory,
-            "benchmark": (8, 12),
-            "commentary": {
-                "high": "High turnover indicates efficient inventory management.",
-                "medium": "Turnover is acceptable, but improvements are possible.",
-                "low": "Low turnover. Investigate overstocking or slow-moving items.",
-            },
-        },
     },
     "Food Production": {
+        "Production Yield": {
+            "formula": lambda good_units, total_units: (good_units / total_units) * 100,
+            "parameters": ["good_units", "total_units"],
+            "benchmark": (95, 98),
+            "commentary": {
+                "high": "High production yield! Very efficient.",
+                "medium": "Yield is good, but improvement is possible.",
+                "low": "Low production yield. Investigate causes.",
+            },
+        },
         "Thawing Yield": {
             "formula": lambda after, before: (after / before) * 100,
+            "parameters": ["after", "before"],
             "benchmark": (95, 98),
             "commentary": {
                 "high": "Excellent yield! Minimize weight loss during thawing.",
@@ -50,27 +69,5 @@ INDUSTRY_DATA = {
                 "low": "Yield is low. Investigate thawing process.",
             },
         },
-        "Portioning Accuracy": {
-            "formula": lambda accurate, total: (accurate / total) * 100,
-            "benchmark": (98, 99),
-            "commentary": {
-                "high": "Portioning is highly accurate. Great job!",
-                "medium": "Accuracy is good, but aim for higher precision.",
-                "low": "Portioning accuracy is below standards. Check equipment.",
-            },
-        },
-        "Cost of Goods Sold (COGS)": {
-            "formula": lambda opening, purchases, closing: opening + purchases - closing,
-            "benchmark": (None, None),  # No benchmark for COGS
-            "commentary": {
-                "high": "COGS is calculated. Use this value in other KPIs.",
-                "medium": "COGS is calculated. Use this value in other KPIs.",
-                "low": "COGS is calculated. Use this value in other KPIs.",
-            },
-        },
     },
 }
-
-# Sigma Score calculation
-def calculate_sigma_score(dpm):
-    return scipy.stats.norm.ppf(1 - dpm / 1_000_000) + 1.5
