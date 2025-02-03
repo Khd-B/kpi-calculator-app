@@ -1,5 +1,6 @@
-# kpi_data.py
+import scipy.stats
 
+# Define KPI formulas, benchmarks, and commentary for each industry
 INDUSTRY_DATA = {
     "Rigid Plastics": {
         "On-Time Delivery Rate": {
@@ -29,7 +30,15 @@ INDUSTRY_DATA = {
                 "low": "Low OEE. Investigate downtime, speed losses, or defects.",
             },
         },
-        # Add more KPIs here...
+        "Inventory Turnover Ratio": {
+            "formula": lambda cogs, avg_inventory: cogs / avg_inventory,
+            "benchmark": (8, 12),
+            "commentary": {
+                "high": "High turnover indicates efficient inventory management.",
+                "medium": "Turnover is acceptable, but improvements are possible.",
+                "low": "Low turnover. Investigate overstocking or slow-moving items.",
+            },
+        },
     },
     "Food Production": {
         "Thawing Yield": {
@@ -50,15 +59,18 @@ INDUSTRY_DATA = {
                 "low": "Portioning accuracy is below standards. Check equipment.",
             },
         },
-        "Sanitation Compliance Rate": {
-            "formula": lambda compliant, total: (compliant / total) * 100,
-            "benchmark": (100, 100),
+        "Cost of Goods Sold (COGS)": {
+            "formula": lambda opening, purchases, closing: opening + purchases - closing,
+            "benchmark": (None, None),  # No benchmark for COGS
             "commentary": {
-                "high": "Perfect compliance! Maintain high standards.",
-                "medium": "Compliance is good, but aim for 100%.",
-                "low": "Compliance is low. Address sanitation issues immediately.",
+                "high": "COGS is calculated. Use this value in other KPIs.",
+                "medium": "COGS is calculated. Use this value in other KPIs.",
+                "low": "COGS is calculated. Use this value in other KPIs.",
             },
         },
-        # Add more KPIs here...
     },
 }
+
+# Sigma Score calculation
+def calculate_sigma_score(dpm):
+    return scipy.stats.norm.ppf(1 - dpm / 1_000_000) + 1.5
